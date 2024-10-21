@@ -7,17 +7,16 @@ import scipy as sc
 Далее – создадим результирующую матрицу в виде списка, в который будем заносить ответы. И перемножим заданные матрицы.
 """
 def matrix_multiplication(matrix_a, matrix_b):
-
     if len(matrix_a[0]) != len(matrix_b):
-        raise ValueError("Несоответствие размеров матриц.")
-
+        raise ValueError()
+    
     result = [[0 for _ in range(len(matrix_b[0]))] for _ in range(len(matrix_a))]
-
+    
     for i in range(len(matrix_a)):
         for j in range(len(matrix_b[0])):
             for k in range(len(matrix_b)):
                 result[i][j] += matrix_a[i][k] * matrix_b[k][j]
-
+    
     return result
 
 """
@@ -30,33 +29,28 @@ def matrix_multiplication(matrix_a, matrix_b):
 def functions(a_1, a_2):
     coeffs1 = list(map(int, a_1.split()))
     coeffs2 = list(map(int, a_2.split()))
-
+    
     a1, b1, c1 = coeffs1
     a2, b2, c2 = coeffs2
-
-    # на всякий случай проверим, не равны ли коэффициенты функций
+    
     if coeffs1 == coeffs2:
         return None
-
-    # решение уравнения f(x) = g(x) сводится к  a1*x^2 + b1*x + c1 = a2*x^2 + b2*x + c2
-    # преобразуем ур-ния к виду (a1 - a2)x^2 + (b1 - b2)x + (c1 - c2) = 0
+    
     A = a1 - a2
     B = b1 - b2
     C = c1 - c2
-
-    disc = B**2 - 4*A*C
-
-    if disc < 0:
+    
+    discriminant = B**2 - 4*A*C
+    
+    if discriminant < 0:
         return []
-
-    elif disc == 0:
+    elif discriminant == 0:
         x = -B / (2*A)
         y = a1*x**2 + b1*x + c1
         return [(x, y)]
-
     else:
-        x1 = (-B + np.sqrt(disc)) / (2*A)
-        x2 = (-B - np.sqrt(disc)) / (2*A)
+        x1 = (-B + np.sqrt(discriminant)) / (2*A)
+        x2 = (-B - np.sqrt(discriminant)) / (2*A)
         y1 = a1*x1**2 + b1*x1 + c1
         y2 = a1*x2**2 + b1*x2 + c1
         return [(x1, y1), (x2, y2)]
