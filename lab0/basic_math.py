@@ -4,14 +4,18 @@ import numpy as np
 # задание 1
 def matrix_multiplication(matrix_a, matrix_b):
 
+    rows_a = len(matrix_a)
+    cols_a = len(matrix_a[0])
+    cols_b = len(matrix_b[0])
+
     if len(matrix_a[0]) != len(matrix_b):
         raise ValueError("Несоответствие размеров матриц.")
 
-    result = [[0 for _ in range(len(matrix_b[0]))] for _ in range(len(matrix_a))]
+    result = [[0 for _ in range(cols_b)] for _ in range(rows_a)]
 
-    for i in range(len(matrix_a)):
-        for j in range(len(matrix_b[0])):
-            for k in range(len(matrix_b)):
+    for i in range(rows_a):
+        for j in range(cols_b):
+            for k in range(cols_a):
                 result[i][j] += matrix_a[i][k] * matrix_b[k][j]
 
     return result
