@@ -22,54 +22,77 @@ def matrix_multiplication(matrix_a, matrix_b):
 
 # задание 2
 def functions(a_1, a_2):
-    coeffs1 = list(map(int, a_1.split()))
-    coeffs2 = list(map(int, a_2.split()))
+    def count_extremum(coeffs):
+        a, b, c = coeffs
+        if a == 0:
+            return None if b == 0 else -c / b
+        else:
+            return -b / (2 * a)
 
-    a1, b1, c1 = coeffs1
-    a2, b2, c2 = coeffs2
+    def build_function(coeffs, x):
+        a, b, c = coeffs
+        return a * x ** 2 + b * x + c
 
-    # на всякий случай проверим, не равны ли коэффициенты функций
-    if coeffs1 == coeffs2:
-        return None
+    def count_mutual_solutions(a1, a2):
+        a = a1[0] - a2[0]
+        b = a1[1] - a2[1]
+        c = a1[2] - a2[2]
 
-    # решение уравнения f(x) = g(x) сводится к  a1*x^2 + b1*x + c1 = a2*x^2 + b2*x + c2
-    # преобразуем ур-ния к виду (a1 - a2)x^2 + (b1 - b2)x + (c1 - c2) = 0
-    A = a1 - a2
-    B = b1 - b2
-    C = c1 - c2
+        # рассмотрим несколько вариантов решения
+        # 1 – все коэффициенты равны нулю, и решений бесконечно много
+        if a == 0 and b == 0 and c == 0:
+            return None
 
-    disc = B**2 - 4*A*C
+        # 2 – уравнение получилось линейным, поэтому решаем линейное уравнение
+        if a == 0:
+            if b == 0:
+                return []
+            else:
+                x = -c / b
+                return [(x, build_function(a1, x))]
 
-    if disc < 0:
-        return []
+        discriminant = b ** 2 - 4 * a * c
 
-    elif disc == 0:
-        x = -B / (2*A)
-        y = a1*x**2 + b1*x + c1
-        return [(x, y)]
+        # условия для 3-х видов дискриминантов
+        if discriminant < 0:
+            return []
+        elif discriminant == 0:
+            x = -b / (2 * a)
+            return [(x, build_function(a1, x))]
+        else:
+            x1 = (-b + np.sqrt(discriminant)) / (2 * a)
+            x2 = (-b - np.sqrt(discriminant)) / (2 * a)
+            return [(x1, build_function(a1, x1)), (x2, build_function(a1, x2))]
 
-    else:
-        x1 = (-B + np.sqrt(disc)) / (2*A)
-        x2 = (-B - np.sqrt(disc)) / (2*A)
-        y1 = a1*x1**2 + b1*x1 + c1
-        y2 = a1*x2**2 + b1*x2 + c1
-        return [(x1, y1), (x2, y2)]
+    coeffs_1 = list(map(float, a_1.split()))
+    coeffs_2 = list(map(float, a_2.split()))
+
+    extremum_1 = count_extremum(coeffs_1)
+    extremum_2 = count_extremum(coeffs_2)
+
+    mutual_solutions = count_mutual_solutions(coeffs_1, coeffs_2)
+
+    return mutual_solutions
+
+
+# добавим вспомогательную функцию для расчета центрального момента заданного порядка.
+def find_central_moment(x, order):
+    return np.sum((x - np.mean(x)) ** order) / len(x)
 
 
 # задание 3.1
 def skew(x):
-    n = len(x)
-    mean_x = np.mean(x)
-    std_x = np.std(x, ddof=1)
-    skewness = (n / ((n - 1) * (n - 2))) * sum(((xi - mean_x) / std_x) ** 3 for xi in x)
+    m2 = find_central_moment(x, 2)
+    m3 = find_central_moment(x, 3)
+    sigma = np.sqrt(m2)
+    skewness = m3 / sigma ** 3
     return round(skewness, 2)
 
 
 # задание 3.2
 def kurtosis(x):
-    n = len(x)
-    mean_x = np.mean(x)
-    std_x = np.std(x, ddof=1)
-    kurt = ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * sum(((xi - mean_x) / std_x) ** 4 for xi in x)
-    kurt -= (3 * (n - 1) ** 2) / ((n - 2) * (n - 3))
+    m2 = find_central_moment(x, 2)
+    m4 = find_central_moment(x, 4)
+    sigma = np.sqrt(m2)
+    kurt = m4 / sigma ** 4 - 3
     return round(kurt, 2)
